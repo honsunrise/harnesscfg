@@ -1,0 +1,20 @@
+id = "claude-desktop"
+name = "Claude Desktop"
+homepage = "https://claude.ai/download"
+kind = "desktop"
+binaries = []
+config_dir = "~/Library/Application Support/Claude"
+platforms = ["macos"]
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://modelcontextprotocol.io/docs/2026-07-28/develop/connect-local-servers",
+  "https://support.claude.com/en/articles/10065433-install-claude-desktop",
+]
+notes = "Linux beta exists; config path not documented. This entry records only the verified macOS location."
+
+[[file]]
+name = "claude_desktop_config.json"
+format = "json"
+role = "mcp"
+description = "User configuration for local MCP servers launched by Claude Desktop."

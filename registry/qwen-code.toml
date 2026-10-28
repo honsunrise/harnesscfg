@@ -1,0 +1,28 @@
+id = "qwen-code"
+name = "Qwen Code"
+homepage = "https://github.com/QwenLM/qwen-code"
+kind = "cli"
+binaries = ["qwen"]
+config_dir = "~/.qwen"
+config_dir_env = "QWEN_HOME"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/",
+  "https://github.com/QwenLM/qwen-code/blob/32f6713ce6394b48dc384d301ee761fb9a1b5b80/packages/core/src/config/storage.ts",
+  "https://github.com/QwenLM/qwen-code/blob/32f6713ce6394b48dc384d301ee761fb9a1b5b80/packages/core/src/utils/paths.ts",
+  "https://github.com/QwenLM/qwen-code/blob/32f6713ce6394b48dc384d301ee761fb9a1b5b80/packages/cli/src/config/settings.ts",
+]
+notes = "QWEN.md is the default global context filename and can be changed with context.fileName; credentials and runtime memory/state files are excluded."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "User-wide settings including model, tool, and MCP configuration."
+
+[[file]]
+name = "QWEN.md"
+format = "text"
+role = "rules"
+description = "Default global instructions applied across projects."

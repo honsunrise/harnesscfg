@@ -1,0 +1,33 @@
+id = "aider"
+name = "aider"
+homepage = "https://aider.chat"
+kind = "cli"
+binaries = ["aider"]
+config_dir = "~"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://aider.chat/docs/config/aider_conf.html",
+  "https://aider.chat/docs/config/adv-model-settings.html",
+  "https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py",
+  "https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/models.py",
+]
+notes = "User-level defaults are loaded before repository and current-directory overrides; command-line options can select other files."
+
+[[file]]
+name = ".aider.conf.yml"
+format = "yaml"
+role = "settings"
+description = "Main user configuration file."
+
+[[file]]
+name = ".aider.model.settings.yml"
+format = "yaml"
+role = "models"
+description = "User overrides and additional behavioral settings for models."
+
+[[file]]
+name = ".aider.model.metadata.json"
+format = "json"
+role = "models"
+description = "User-defined model context-window limits and token costs."

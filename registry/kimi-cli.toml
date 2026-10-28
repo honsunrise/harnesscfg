@@ -1,0 +1,28 @@
+id = "kimi-cli"
+name = "Kimi Code CLI"
+homepage = "https://moonshotai.github.io/kimi-cli/"
+kind = "cli"
+binaries = ["kimi"]
+config_dir = "~/.kimi"
+config_dir_env = "KIMI_SHARE_DIR"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://moonshotai.github.io/kimi-cli/en/configuration/config-files.html",
+  "https://moonshotai.github.io/kimi-cli/en/configuration/data-locations.html",
+  "https://github.com/MoonshotAI/kimi-cli/blob/main/src/kimi_cli/share.py",
+  "https://github.com/MoonshotAI/kimi-cli/blob/main/src/kimi_cli/config.py",
+]
+notes = "config.toml and mcp.json may contain API keys; harnesscfg never reads or logs values. Legacy config.json is migrated to config.toml and is not recorded as a separate active configuration file."
+
+[[file]]
+name = "config.toml"
+format = "toml"
+role = "settings"
+description = "Main provider, model, service, and runtime configuration."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "User-wide MCP server configuration."

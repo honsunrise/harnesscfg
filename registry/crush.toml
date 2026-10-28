@@ -1,0 +1,34 @@
+id = "crush"
+name = "Crush"
+homepage = "https://github.com/charmbracelet/crush"
+kind = "cli"
+binaries = ["crush"]
+config_dir = "$XDG_CONFIG_HOME/crush"
+config_dir_env = "CRUSH_GLOBAL_CONFIG"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/charmbracelet/crush/blob/3538c722ffce86ce41543df72c6efa4ea5e1672e/README.md",
+  "https://github.com/charmbracelet/crush/blob/3538c722ffce86ce41543df72c6efa4ea5e1672e/docs/config/README.md",
+  "https://github.com/charmbracelet/crush/blob/3538c722ffce86ce41543df72c6efa4ea5e1672e/internal/config/load.go",
+  "https://github.com/charmbracelet/crush/blob/3538c722ffce86ce41543df72c6efa4ea5e1672e/internal/home/home.go",
+]
+notes = "Current upstream uses Bash-based crushrc; legacy crush.json remains supported but deprecated, and crushrc overrides JSON in the same directory. The user configuration path is XDG-based on macOS too; data-directory JSON state is excluded."
+
+[[file]]
+name = "crushrc"
+format = "text"
+role = "settings"
+description = "Bash-based user configuration executed at startup."
+
+[[file]]
+name = "crush.json"
+format = "json"
+role = "settings"
+description = "Legacy JSON user configuration for providers, models, tools, and MCP servers."
+
+[[file]]
+name = "CRUSH.md"
+format = "text"
+role = "rules"
+description = "Crush-specific global instructions applied across projects."

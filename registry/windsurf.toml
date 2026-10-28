@@ -1,0 +1,27 @@
+id = "windsurf"
+name = "Windsurf"
+homepage = "https://windsurf.com"
+kind = "editor"
+binaries = []
+config_dir = "~/.codeium/windsurf"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.windsurf.com/es/windsurf/cascade/mcp",
+  "https://docs.devin.ai/windsurf/plugins/cascade/mcp",
+  "https://docs.windsurf.com/es/windsurf/cascade/memories",
+  "https://docs.devin.ai/desktop/cascade/memories",
+]
+notes = "Original stable Windsurf / legacy Cascade paths; Windsurf Next uses a different root. Current English docs distinguish this editor-discovery MCP file from Devin Desktop's Cortex-managed configuration."
+
+[[file]]
+name = "mcp_config.json"
+format = "json"
+role = "mcp"
+description = "User MCP servers for original Windsurf Cascade and stable editor discovery."
+
+[[file]]
+name = "memories/global_rules.md"
+format = "text"
+role = "rules"
+description = "Always-on user-written global rules applied across workspaces."

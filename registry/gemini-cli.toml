@@ -1,0 +1,26 @@
+id = "gemini-cli"
+name = "Gemini CLI"
+homepage = "https://geminicli.com"
+kind = "cli"
+binaries = ["gemini"]
+config_dir = "~/.gemini"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://geminicli.com/docs/reference/configuration",
+  "https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/config/storage.ts",
+  "https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/utils/paths.ts",
+]
+notes = "GEMINI_CLI_HOME overrides the home directory, not the configuration directory: settings resolve to $GEMINI_CLI_HOME/.gemini/settings.json, so it is not represented as config_dir_env."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Global user settings including models, tools and MCP servers."
+
+[[file]]
+name = "GEMINI.md"
+format = "text"
+role = "rules"
+description = "Default global context instructions, with the filename configurable in settings."

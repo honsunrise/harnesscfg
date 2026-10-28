@@ -1,0 +1,28 @@
+id = "vscode-copilot"
+name = "GitHub Copilot in Visual Studio Code"
+homepage = "https://code.visualstudio.com/docs/copilot/overview"
+kind = "editor"
+binaries = []
+config_dir = "~/.config/Code/User"
+config_dir_macos = "~/Library/Application Support/Code/User"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://code.visualstudio.com/docs/configure/settings",
+  "https://code.visualstudio.com/docs/configure/profiles",
+  "https://code.visualstudio.com/docs/agents/reference/mcp-configuration",
+  "https://github.com/microsoft/vscode/blob/main/src/vs/platform/userDataProfile/common/userDataProfile.ts",
+]
+notes = "Stable VS Code default user profile only; named profiles and portable installations use other locations. User-profile mcp.json remains a compatibility configuration; newer Copilot sessions also support a separate portable ~/.copilot/mcp-config.json, not recorded here."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Global VS Code user settings, including Copilot and agent settings."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "Default user-profile MCP server configuration in the VS Code format."

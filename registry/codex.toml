@@ -1,0 +1,32 @@
+id = "codex"
+name = "Codex CLI"
+homepage = "https://github.com/openai/codex"
+kind = "cli"
+binaries = ["codex"]
+config_dir = "~/.codex"
+config_dir_env = "CODEX_HOME"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://developers.openai.com/codex/config-basic",
+  "https://developers.openai.com/codex/guides/agents-md",
+]
+notes = "Named profiles may load <profile-name>.config.toml in CODEX_HOME; machine-specific profile names are not fixed registry filenames."
+
+[[file]]
+name = "config.toml"
+format = "toml"
+role = "settings"
+description = "Main user configuration for models, providers, permissions and MCP servers."
+
+[[file]]
+name = "AGENTS.md"
+format = "text"
+role = "rules"
+description = "Global instructions used when no nonempty global override is present."
+
+[[file]]
+name = "AGENTS.override.md"
+format = "text"
+role = "rules"
+description = "Global instruction override selected before AGENTS.md."

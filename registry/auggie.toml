@@ -1,0 +1,20 @@
+id = "auggie"
+name = "Auggie"
+homepage = "https://docs.augmentcode.com/cli/overview"
+kind = "cli"
+binaries = ["auggie"]
+config_dir = "~/.augment"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.augmentcode.com/cli/config",
+  "https://docs.augmentcode.com/cli/integrations",
+  "https://docs.augmentcode.com/cli/rules",
+]
+notes = "settings.json may contain MCP API keys; harnesscfg never reads or logs values. The .json filename accepts JSON comments and trailing commas. User-wide Markdown rules are recursively read from ~/.augment/rules, but their filenames are user-chosen and are not enumerated."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "User-wide CLI preferences, permissions, and MCP server definitions."

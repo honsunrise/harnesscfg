@@ -1,0 +1,37 @@
+id = "opencode"
+name = "OpenCode"
+homepage = "https://opencode.ai"
+kind = "cli"
+binaries = ["opencode"]
+config_dir = "$XDG_CONFIG_HOME/opencode"
+config_dir_env = "OPENCODE_CONFIG_DIR"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://opencode.ai/docs/config",
+  "https://github.com/anomalyco/opencode/blob/dev/packages/util/src/global-roots.ts",
+  "https://github.com/anomalyco/opencode/blob/dev/packages/util/src/global.ts",
+  "https://github.com/anomalyco/opencode/blob/dev/packages/core/src/config/discovery.ts",
+  "https://github.com/anomalyco/opencode/blob/dev/packages/cli/src/config/config.ts",
+]
+notes = "Current upstream source relocates the global configuration directory with OPENCODE_CONFIG_DIR; older documentation describes it as an additional directory. Machine-specific profiles/cn.json was not verified as a native upstream path."
+
+[[file]]
+name = "opencode.json"
+alternate_extensions = ["jsonc"]
+format = "json"
+role = "settings"
+description = "Global configuration for providers, models, permissions and MCP servers."
+
+[[file]]
+name = "cli.json"
+format = "json"
+role = "settings"
+description = "CLI configuration read with JSON comments and trailing commas supported."
+
+[[file]]
+name = "tui.json"
+alternate_extensions = ["jsonc"]
+format = "json"
+role = "settings"
+description = "TUI preferences documented separately from server configuration."

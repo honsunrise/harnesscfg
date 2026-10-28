@@ -1,0 +1,25 @@
+id = "iflow-cli"
+name = "iFlow CLI"
+homepage = "https://github.com/iflow-ai/iflow-cli"
+kind = "cli"
+binaries = ["iflow"]
+config_dir = "~/.iflow"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/iflow-ai/iflow-cli/blob/main/docs_en/configuration/settings.md",
+  "https://github.com/iflow-ai/iflow-cli/blob/main/docs_en/configuration/iflow.md",
+]
+notes = "settings.json may contain API keys; harnesscfg never reads or logs values. MCP servers are configured in settings.json. The contextFileName setting can replace the default IFLOW.md name."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "User-wide CLI settings and MCP server definitions."
+
+[[file]]
+name = "IFLOW.md"
+format = "text"
+role = "rules"
+description = "Global instructions and personal coding preferences."

@@ -1,0 +1,20 @@
+id = "continue"
+name = "Continue"
+homepage = "https://www.continue.dev"
+kind = "editor"
+binaries = []
+config_dir = "~/.continue"
+config_dir_env = "CONTINUE_GLOBAL_DIR"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.continue.dev/customize/deep-dives/configuration",
+  "https://github.com/continuedev/continue/blob/main/core/util/paths.ts",
+]
+notes = "Records the current YAML configuration; deprecated config.json and config.ts are omitted."
+
+[[file]]
+name = "config.yaml"
+format = "yaml"
+role = "settings"
+description = "Local user configuration for models, agent behavior and MCP servers."

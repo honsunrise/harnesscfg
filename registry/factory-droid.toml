@@ -1,0 +1,39 @@
+id = "factory-droid"
+name = "Droid"
+homepage = "https://docs.factory.com/droid-cli/settings"
+kind = "cli"
+binaries = ["droid"]
+config_dir = "~/.factory"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.factory.com/droid-cli/settings.md",
+  "https://docs.factory.com/harness/mcp",
+  "https://docs.factory.com/model-independence/byok",
+  "https://docs.factory.com/harness/agents-md",
+]
+notes = "Legacy config.json custom models are copied into settings.json at startup; later edits to already-copied models in config.json are ignored, so the legacy file is not recorded. Droid also accepts compatible instruction filenames and personal instruction directories; AGENTS.md is the recommended filename."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Personal CLI preferences, permissions, hooks, and custom model definitions."
+
+[[file]]
+name = "settings.local.json"
+format = "json"
+role = "settings"
+description = "Machine-specific user settings merged over settings.json."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "Personal MCP server definitions available in every project."
+
+[[file]]
+name = "AGENTS.md"
+format = "text"
+role = "rules"
+description = "Personal instructions discovered in the Factory user directory."

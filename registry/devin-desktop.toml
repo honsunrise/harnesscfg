@@ -1,0 +1,19 @@
+id = "devin-desktop"
+name = "Devin Desktop"
+homepage = "https://docs.devin.ai/desktop/cascade/mcp"
+kind = "desktop"
+binaries = []
+config_dir = "$XDG_CONFIG_HOME/devin"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.devin.ai/desktop/cascade/mcp",
+  "https://docs.devin.ai/windsurf/plugins/cascade/mcp",
+]
+notes = "Cortex-managed MCP configuration for the legacy Cascade agent on macOS and Linux; the default Devin Local agent uses Devin CLI configuration instead."
+
+[[file]]
+name = "mcp_config.json"
+format = "json"
+role = "mcp"
+description = "User MCP server configuration for Devin Desktop's legacy Cascade agent."

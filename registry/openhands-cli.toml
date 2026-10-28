@@ -1,0 +1,34 @@
+id = "openhands-cli"
+name = "OpenHands CLI"
+homepage = "https://github.com/OpenHands/OpenHands-CLI"
+kind = "cli"
+binaries = ["openhands"]
+config_dir = "~/.openhands"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/OpenHands/OpenHands-CLI/blob/main/README.md",
+  "https://github.com/OpenHands/OpenHands-CLI/blob/main/openhands_cli/locations.py",
+  "https://github.com/OpenHands/OpenHands-CLI/blob/main/openhands_cli/stores/agent_store.py",
+  "https://github.com/OpenHands/OpenHands-CLI/blob/main/openhands_cli/stores/cli_settings.py",
+  "https://github.com/OpenHands/OpenHands-CLI/blob/main/openhands_cli/mcp/mcp_utils.py",
+]
+notes = "agent_settings.json and mcp.json may contain API keys; harnesscfg never reads or logs values. The standalone V1 CLI repository is no longer actively maintained. Its source relocates agent_settings.json and mcp.json with OPENHANDS_PERSISTENCE_DIR, but cli_config.json uses PERSISTENCE_DIR instead, so no single config_dir_env is recorded."
+
+[[file]]
+name = "agent_settings.json"
+format = "json"
+role = "settings"
+description = "Persisted agent, language model, and condenser settings."
+
+[[file]]
+name = "cli_config.json"
+format = "json"
+role = "settings"
+description = "CLI and terminal interface preferences including critic settings."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "User-wide MCP server configuration."

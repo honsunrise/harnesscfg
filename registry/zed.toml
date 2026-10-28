@@ -1,0 +1,21 @@
+id = "zed"
+name = "Zed"
+homepage = "https://zed.dev"
+kind = "editor"
+binaries = []
+config_dir = "$XDG_CONFIG_HOME/zed"
+config_dir_macos = "~/.config/zed"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/zed-industries/zed/blob/main/docs/src/configuring-zed.md",
+  "https://zed.dev/docs/ai/mcp",
+  "https://zed.dev/docs/reference/all-settings",
+]
+notes = "Agent settings and MCP context_servers share the user settings file; JSON comments are supported."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Global editor settings, including agent configuration and MCP servers."

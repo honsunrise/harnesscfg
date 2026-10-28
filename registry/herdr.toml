@@ -1,0 +1,19 @@
+id = "herdr"
+name = "Herdr"
+homepage = "https://github.com/herdrdev/herdr"
+kind = "multiplexer"
+binaries = ["herdr"]
+config_dir = "$XDG_CONFIG_HOME/herdr"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/herdrdev/herdr/blob/master/src/config/io.rs",
+  "https://github.com/herdrdev/herdr/blob/master/src/config.rs",
+]
+notes = "Release builds use herdr; debug builds use herdr-dev. HERDR_CONFIG_PATH overrides the complete file path, not config_dir, so it is not represented as config_dir_env. macOS uses the same ~/.config fallback as Linux."
+
+[[file]]
+name = "config.toml"
+format = "toml"
+role = "settings"
+description = "User configuration for terminal, workspace, keybinding and UI preferences."

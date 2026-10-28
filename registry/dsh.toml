@@ -1,0 +1,70 @@
+id = "dsh"
+name = "DeepSeek Harness"
+homepage = "https://github.com/deepseek-ai/deepseek-harness"
+kind = "cli"
+binaries = ["dsh"]
+config_dir = "~/.dsh"
+config_dir_env = "DSH_HOME"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/util/home-paths/src/index.ts",
+  "https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/README.md",
+  "https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/src/profile-boot.ts",
+  "https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/src/profile.ts",
+]
+notes = "Profiles also support arbitrary custom names and sdk-minimal; listed profile paths cover the four profiles used by this machine. Generated empty cordis.yml roots and installed node_modules bundles are excluded; @nix-config/dsh-defaults is consumer-owned, not an upstream config filename."
+
+[[file]]
+name = "cordis.patch.yml"
+format = "yaml"
+role = "settings"
+description = "Home-level user patch layer applied across every profile."
+
+[[file]]
+name = "profiles/web/package.json"
+format = "json"
+role = "settings"
+description = "Web profile manifest and plugin dependency configuration."
+
+[[file]]
+name = "profiles/web/cordis.patch.yml"
+format = "yaml"
+role = "settings"
+description = "Web profile user patch layer."
+
+[[file]]
+name = "profiles/sdk/package.json"
+format = "json"
+role = "settings"
+description = "SDK profile manifest and plugin dependency configuration."
+
+[[file]]
+name = "profiles/sdk/cordis.patch.yml"
+format = "yaml"
+role = "settings"
+description = "SDK profile user patch layer."
+
+[[file]]
+name = "profiles/headless/package.json"
+format = "json"
+role = "settings"
+description = "Headless profile manifest and plugin dependency configuration."
+
+[[file]]
+name = "profiles/headless/cordis.patch.yml"
+format = "yaml"
+role = "settings"
+description = "Headless profile user patch layer."
+
+[[file]]
+name = "profiles/acp/package.json"
+format = "json"
+role = "settings"
+description = "ACP profile manifest and plugin dependency configuration."
+
+[[file]]
+name = "profiles/acp/cordis.patch.yml"
+format = "yaml"
+role = "settings"
+description = "ACP profile user patch layer."

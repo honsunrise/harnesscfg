@@ -1,0 +1,28 @@
+id = "goose"
+name = "goose"
+homepage = "https://github.com/block/goose"
+kind = "cli"
+binaries = ["goose"]
+config_dir = "$XDG_CONFIG_HOME/goose"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/block/goose/blob/398165c9376e61157ba9cfdd487ca9622d716955/documentation/docs/guides/config-files.md",
+  "https://github.com/block/goose/blob/398165c9376e61157ba9cfdd487ca9622d716955/crates/goose/src/config/paths.rs",
+  "https://github.com/block/goose/blob/398165c9376e61157ba9cfdd487ca9622d716955/crates/goose/src/config/base.rs",
+  "https://github.com/block/goose/blob/398165c9376e61157ba9cfdd487ca9622d716955/crates/goose/src/config/permission.rs",
+  "https://github.com/block/goose/blob/398165c9376e61157ba9cfdd487ca9622d716955/documentation/docs/guides/environment-variables.md",
+]
+notes = "macOS and Linux use the same XDG configuration directory, defaulting to ~/.config/goose. GOOSE_PATH_ROOT changes the location to <absolute-root>/config, not the root itself, so it is not represented as config_dir_env. Secrets and runtime tool-permission state are excluded."
+
+[[file]]
+name = "config.yaml"
+format = "yaml"
+role = "settings"
+description = "User configuration for providers, models, extensions, and general settings."
+
+[[file]]
+name = "permission.yaml"
+format = "yaml"
+role = "settings"
+description = "User-configured tool permission levels."

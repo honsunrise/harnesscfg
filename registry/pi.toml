@@ -1,0 +1,66 @@
+id = "pi"
+name = "Pi"
+homepage = "https://github.com/earendil-works/pi"
+kind = "cli"
+binaries = ["pi"]
+config_dir = "~/.pi/agent"
+config_dir_env = "PI_CODING_AGENT_DIR"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/config.ts",
+  "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/settings-manager.ts",
+  "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/model-config.ts",
+  "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/resource-loader.ts",
+  "https://github.com/nicobailon/pi-subagents/blob/main/src/extension/config.ts",
+  "https://github.com/nicobailon/pi-subagents/blob/main/src/shared/utils.ts",
+]
+notes = "The extensions/subagent/config.json file requires the pi-subagents extension; auth.json and session data are excluded."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Global agent settings."
+
+[[file]]
+name = "models.json"
+format = "json"
+role = "models"
+description = "Custom models and provider overrides, supporting JSON comments."
+
+[[file]]
+name = "SYSTEM.md"
+format = "text"
+role = "rules"
+description = "Global replacement system prompt used when no trusted project replacement exists."
+
+[[file]]
+name = "APPEND_SYSTEM.md"
+format = "text"
+role = "rules"
+description = "Global appended system prompt used when no trusted project append file exists."
+
+[[file]]
+name = "extensions/subagent/config.json"
+format = "json"
+role = "settings"
+description = "Pi subagents extension configuration."
+
+[[file]]
+name = "AGENTS.md"
+format = "text"
+role = "rules"
+description = "Global context instructions, selected after AGENTS.override.md."
+
+[[file]]
+name = "AGENTS.override.md"
+format = "text"
+role = "rules"
+description = "Global context instruction override selected before AGENTS.md."
+
+[[file]]
+name = "CLAUDE.md"
+format = "text"
+role = "rules"
+description = "Fallback global context instructions when no AGENTS filename is present."

@@ -1,0 +1,45 @@
+id = "github-copilot-cli"
+name = "GitHub Copilot CLI"
+homepage = "https://github.com/github/copilot-cli"
+kind = "cli"
+binaries = ["copilot"]
+config_dir = "~/.copilot"
+config_dir_env = "COPILOT_HOME"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference",
+  "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers",
+  "https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/add-lsp-servers",
+]
+notes = "settings.json supports JSONC; config.json now holds authentication and internal state, and user settings left there are ignored. Previous XDG locations are migrated to ~/.copilot when COPILOT_HOME is unset. The legacy --config-dir flag can override the directory; COPILOT_PROVIDERS_CONFIG independently overrides providers.json."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "Personal CLI settings and global defaults for all repositories."
+
+[[file]]
+name = "mcp-config.json"
+format = "json"
+role = "mcp"
+description = "User-level MCP server definitions available in all sessions."
+
+[[file]]
+name = "lsp-config.json"
+format = "json"
+role = "other"
+description = "User-level Language Server Protocol server definitions."
+
+[[file]]
+name = "providers.json"
+format = "json"
+role = "models"
+description = "User-level provider and model registry for bring-your-own-key inference."
+
+[[file]]
+name = "copilot-instructions.md"
+format = "text"
+role = "rules"
+description = "Personal custom instructions applied to all sessions."

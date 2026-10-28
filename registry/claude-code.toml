@@ -1,0 +1,40 @@
+id = "claude-code"
+name = "Claude Code"
+homepage = "https://code.claude.com"
+kind = "cli"
+binaries = ["claude"]
+config_dir = "~/.claude"
+config_dir_env = "CLAUDE_CONFIG_DIR"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://code.claude.com/docs/en/settings",
+  "https://code.claude.com/docs/en/memory",
+  "https://github.com/jarrodwatts/claude-hud/blob/main/src/claude-config-dir.ts",
+  "https://github.com/jarrodwatts/claude-hud/blob/main/src/config.ts",
+]
+notes = "HUD files require the claude-hud plugin; .claude.json is excluded because it mixes account and per-project state with configuration, and arbitrary --settings preset filenames are not built-in paths."
+
+[[file]]
+name = "settings.json"
+format = "json"
+role = "settings"
+description = "User settings for all projects."
+
+[[file]]
+name = "CLAUDE.md"
+format = "text"
+role = "rules"
+description = "Personal instructions for all projects."
+
+[[file]]
+name = "plugins/claude-hud/config.json"
+format = "json"
+role = "settings"
+description = "Claude HUD plugin display configuration."
+
+[[file]]
+name = "claude-hud.json"
+format = "json"
+role = "settings"
+description = "Per-Claude-directory overrides for Claude HUD plugin configuration."

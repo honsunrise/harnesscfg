@@ -1,0 +1,40 @@
+id = "omp"
+name = "oh-my-pi"
+homepage = "https://github.com/can1357/oh-my-pi"
+kind = "cli"
+binaries = ["omp"]
+config_dir = "~/.omp/agent"
+config_dir_env = "PI_CODING_AGENT_DIR"
+lock = "omp"
+verified = "2026-10-28"
+sources = [
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/utils/src/dirs.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/src/config/settings.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/src/config/model-registry.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/src/config/config-file.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/src/mcp/config-writer.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/packages/utils/src/file-lock.ts",
+  "https://github.com/can1357/oh-my-pi/blob/main/crates/pi-natives/src/file_lock/mod.rs",
+  "https://github.com/can1357/oh-my-pi/blob/main/crates/pi-natives/src/file_lock/unix.rs",
+]
+notes = "Default-profile agent files are rooted here; PI_CONFIG_DIR and named OMP profiles can change that root. Settings and MCP writes use pi-natives FileLock through pi-utils: abstract Unix sockets on Linux and a persistent .lock sidecar with flock on macOS."
+
+[[file]]
+name = "config.yml"
+alternate_extensions = ["yaml"]
+format = "yaml"
+role = "settings"
+description = "Global agent settings, with config.yaml accepted as a fallback."
+
+[[file]]
+name = "models.yml"
+alternate_extensions = ["yaml"]
+format = "yaml"
+role = "models"
+description = "Custom model catalog and provider configuration."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "User-level MCP server configuration."

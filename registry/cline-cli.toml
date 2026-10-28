@@ -1,0 +1,34 @@
+id = "cline-cli"
+name = "Cline CLI"
+homepage = "https://docs.cline.bot/cli/cli-reference"
+kind = "cli"
+binaries = ["cline"]
+config_dir = "~"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://docs.cline.bot/getting-started/config",
+  "https://docs.cline.bot/customization/cline-rules",
+  "https://github.com/cline/cline/blob/main/sdk/packages/shared/src/storage/paths.ts",
+  "https://github.com/cline/cline/blob/main/sdk/packages/core/src/services/global-settings.ts",
+  "https://github.com/cline/cline/blob/main/apps/cli/src/wizards/mcp/settings.ts",
+]
+notes = "cline_mcp_settings.json may contain API keys and MCP OAuth state; harnesscfg never reads or logs values. CLINE_DIR relocates .cline, while CLINE_DATA_DIR relocates its data subtree independently; neither relocates .agents/AGENTS.md. Global Markdown rule directories under .cline/rules and Documents/Cline/Rules have user-chosen filenames and are not enumerated. providers.json is excluded because it stores provider credentials."
+
+[[file]]
+name = ".cline/data/settings/global-settings.json"
+format = "json"
+role = "settings"
+description = "Global CLI preferences and tool approval settings."
+
+[[file]]
+name = ".cline/data/settings/cline_mcp_settings.json"
+format = "json"
+role = "mcp"
+description = "Global MCP server definitions and enablement settings."
+
+[[file]]
+name = ".agents/AGENTS.md"
+format = "text"
+role = "rules"
+description = "Cross-tool global instructions read by Cline."

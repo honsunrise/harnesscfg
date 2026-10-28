@@ -1,0 +1,32 @@
+id = "amp"
+name = "Amp"
+homepage = "https://ampcode.com"
+kind = "cli"
+binaries = ["amp"]
+config_dir = "~/.config"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://ampcode.com/docs/cli/settings",
+  "https://ampcode.com/docs/customize/agents-md",
+]
+notes = "The root includes both Amp-specific configuration and the shared personal guidance file. User settings can be redirected with --settings-file; both personal AGENTS.md files are always included when present."
+
+[[file]]
+name = "amp/settings.json"
+format = "json"
+role = "settings"
+description = "User preferences, keybindings, MCP servers, and permissions."
+alternate_extensions = ["jsonc"]
+
+[[file]]
+name = "amp/AGENTS.md"
+format = "text"
+role = "rules"
+description = "Amp-specific personal instructions included in every session."
+
+[[file]]
+name = "AGENTS.md"
+format = "text"
+role = "rules"
+description = "Shared personal instructions included alongside Amp-specific guidance."

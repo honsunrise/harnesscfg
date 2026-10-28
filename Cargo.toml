@@ -1,0 +1,29 @@
+[package]
+name = "harnesscfg"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Seed and sync the writable configuration of AI coding agent harnesses from Nix"
+license = "MIT"
+repository = "https://github.com/honsunrise/harnesscfg"
+readme = "README.md"
+keywords = ["nix", "home-manager", "ai-agents", "configuration"]
+categories = ["command-line-utilities", "config"]
+publish = false
+[dependencies]
+clap = { version = "4.6", features = ["derive"] }
+jsonc-parser = { version = "0.34", features = ["cst", "preserve_order", "serde", "serde_json"], default-features = false }
+rustix = { version = "1.1", features = ["fs", "process"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.11"
+tempfile = "3.27"
+thiserror = "2"
+toml = { version = "0.9", default-features = false, features = ["parse", "serde"] }
+toml_edit = "0.25"
+xxhash-rust = { version = "0.8", features = ["xxh64"] }
+yaml-edit = "0.3.5"
+
+[dev-dependencies]
+tempfile = "3.27"
+toml_edit = "0.25"

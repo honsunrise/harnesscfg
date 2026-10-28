@@ -1,0 +1,27 @@
+id = "cursor-agent"
+name = "Cursor CLI"
+homepage = "https://cursor.com/docs/cli/overview"
+kind = "cli"
+binaries = ["agent", "cursor-agent"]
+config_dir = "~/.cursor"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://cursor.com/docs/cli/reference/configuration",
+  "https://cursor.com/docs/cli/reference/parameters",
+  "https://cursor.com/docs/mcp",
+  "https://cursor.com/install",
+]
+notes = "cli-config.json requires pure JSON; its directory can be overridden with CURSOR_CONFIG_DIR or, on Linux/BSD, XDG_CONFIG_HOME/cursor. The documentation does not establish whether those overrides also relocate the global mcp.json, so this entry records default paths only."
+
+[[file]]
+name = "cli-config.json"
+format = "json"
+role = "settings"
+description = "Global CLI preferences, model selection, permissions, and sandbox settings."
+
+[[file]]
+name = "mcp.json"
+format = "json"
+role = "mcp"
+description = "Global MCP server definitions shared with the Cursor editor."

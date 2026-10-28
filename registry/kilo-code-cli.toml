@@ -1,0 +1,66 @@
+id = "kilo-code-cli"
+name = "Kilo Code CLI"
+homepage = "https://kilo.ai"
+kind = "cli"
+binaries = ["kilo"]
+config_dir = "$XDG_CONFIG_HOME/kilo"
+lock = "none"
+verified = "2026-10-28"
+sources = [
+  "https://kilo.ai/docs/getting-started/settings",
+  "https://kilo.ai/docs/contributing/architecture/cli-runtime",
+  "https://github.com/Kilo-Org/kilocode/blob/v7.1.17/packages/opencode/src/global/index.ts",
+  "https://github.com/Kilo-Org/kilocode/blob/v7.1.17/packages/opencode/src/config/config.ts",
+  "https://github.com/Kilo-Org/kilocode/blob/v7.1.17/packages/opencode/src/config/tui.ts",
+  "https://github.com/Kilo-Org/kilocode/blob/v7.1.17/packages/opencode/src/config/paths.ts",
+  "https://github.com/Kilo-Org/kilocode/blob/v7.1.17/packages/opencode/src/session/instruction.ts",
+]
+notes = "The general settings files may contain provider or MCP API keys; harnesscfg never reads or logs values. Global config filenames are independently merged, including the legacy config.json and opencode.json variants in the Kilo config directory. KILO_CONFIG_DIR adds a higher-precedence config directory rather than relocating the XDG global root."
+
+[[file]]
+name = "kilo.jsonc"
+format = "json"
+role = "settings"
+description = "Recommended global provider, model, permission, and MCP configuration."
+
+[[file]]
+name = "kilo.json"
+format = "json"
+role = "settings"
+description = "Global JSON configuration merged with other global config files."
+
+[[file]]
+name = "config.json"
+format = "json"
+role = "settings"
+description = "Legacy global settings still loaded from the Kilo configuration directory."
+
+[[file]]
+name = "opencode.json"
+format = "json"
+role = "settings"
+description = "Legacy OpenCode-format global configuration read within the Kilo directory."
+
+[[file]]
+name = "opencode.jsonc"
+format = "json"
+role = "settings"
+description = "Legacy commented OpenCode-format global configuration read within the Kilo directory."
+
+[[file]]
+name = "tui.json"
+format = "json"
+role = "settings"
+description = "Global terminal interface appearance and keybinding configuration."
+
+[[file]]
+name = "tui.jsonc"
+format = "json"
+role = "settings"
+description = "Commented global terminal interface appearance and keybinding configuration."
+
+[[file]]
+name = "AGENTS.md"
+format = "text"
+role = "rules"
+description = "Global instructions loaded from the Kilo configuration directory."
