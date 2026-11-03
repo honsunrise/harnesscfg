@@ -45,20 +45,22 @@ pub fn fill_missing(user: &mut Object, defaults: &Object) -> bool {
 /// generation's template `previous` (empty on first sight).
 pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) -> SyncResult<()> {
     match spec {
-        Sync::Enabled { field } => enabled(user, current, previous, field),
+        Sync::Enabled { field, keys } => {
+            enabled(user, current, previous, field)?;
+            if !keys.is_empty() {
+                let (new, old) = (pick(current, keys)?, pick(previous, keys)?);
+                sync_owned(object_mut(user)?, &new, &old);
+            }
+            Ok(())
+        }
         Sync::Preset {
             keys,
             env_keys,
             env_prefixes,
         } => {
             let owned = |data: &Value| -> SyncResult<Object> {
-                let data = object(data)?;
-                let mut picked: Object = data
-                    .iter()
-                    .filter(|(k, _)| keys.contains(k))
-                    .map(|(k, v)| (k.clone(), v.clone()))
-                    .collect();
-                let env: Object = match data.get("env") {
+                let mut picked = pick(data, keys)?;
+                let env: Object = match object(data)?.get("env") {
                     Some(env) => object(env)?
                         .iter()
                         .filter(|(k, _)| {
@@ -337,6 +339,15 @@ fn child(value: &Value, field: &str) -> SyncResult<Object> {
         .unwrap_or_default())
 }
 
+/// The template's top-level keys `keys` names, validated as an object.
+fn pick(value: &Value, keys: &[String]) -> SyncResult<Object> {
+    Ok(object(value)?
+        .iter()
+        .filter(|(k, _)| keys.contains(k))
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect())
+}
+
 /// `setdefault(field, {})`, as the clients store an empty object there too.
 fn entry_object<'a>(map: &'a mut Object, field: &str) -> SyncResult<&'a mut Object> {
     object_mut(
@@ -468,6 +479,7 @@ mod tests {
     fn enabled_lists_keep_custom_entries_first() {
         let spec = Sync::Enabled {
             field: "enabledModels".into(),
+            keys: Vec::new(),
         };
         let mut user = json!({"enabledModels": ["hub/old", "hub/keep", "custom/mine"], "modelRoles": {"default": "custom/mine"}});
         sync(
@@ -480,6 +492,36 @@ mod tests {
         assert_eq!(
             user,
             json!({"enabledModels": ["custom/mine", "hub/keep", "hub/new"], "modelRoles": {"default": "custom/mine"}})
+        );
+    }
+
+    #[test]
+    fn enabled_lists_can_own_a_record_without_dropping_user_roles() {
+        let spec = Sync::Enabled {
+            field: "enabledModels".into(),
+            keys: vec!["modelRoles".into()],
+        };
+        let previous = json!({
+            "enabledModels": ["hub/stale"],
+            "modelRoles": {"default": "hub/stale", "retired": "hub/stale"},
+        });
+        let mut user = json!({
+            "enabledModels": ["custom/mine", "hub/stale"],
+            "modelRoles": {"default": "hub/stale", "retired": "hub/stale", "mine": "custom/mine"},
+            "theme": "dark",
+        });
+        let current = json!({
+            "enabledModels": ["hub/new"],
+            "modelRoles": {"default": "hub/new", "plan": "hub/new"},
+        });
+        sync(&spec, &mut user, &current, &previous).unwrap();
+        assert_eq!(
+            user,
+            json!({
+                "enabledModels": ["custom/mine", "hub/new"],
+                "modelRoles": {"default": "hub/new", "plan": "hub/new", "mine": "custom/mine"},
+                "theme": "dark",
+            })
         );
     }
 

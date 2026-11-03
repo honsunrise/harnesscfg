@@ -72,9 +72,13 @@ module.
 | Field | Default |
 | --- | --- |
 | `field` | `enabledModels` |
+| `keys` | `[]` |
 
 Result: ids of the user list that neither template mentions, in user order,
-followed by `current`'s list. Other keys are untouched.
+followed by `current`'s list. Other keys are untouched, except those `keys`
+names: they follow the template like `preset` keys, recursing into records, so
+a template role overwrites the user's value, a role only the previous template
+declared is removed, and entries the user added stay.
 
 ### `providers`
 

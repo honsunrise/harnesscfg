@@ -84,6 +84,9 @@ pub enum Sync {
     Enabled {
         #[serde(default = "enabled_field")]
         field: String,
+        /// Extra top-level keys Nix owns, merged like `preset` keys.
+        #[serde(default)]
+        keys: Vec<String>,
     },
     /// Top-level model fields and model-related `env` entries of a preset.
     #[serde(rename_all = "camelCase")]
