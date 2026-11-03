@@ -144,7 +144,7 @@ fn plan_bundle(
             path: target.clone(),
         });
     }
-    let spec = entry
+    entry
         .sync
         .iter()
         .find(|spec| matches!(spec, Sync::Patch { .. }))
@@ -163,7 +163,11 @@ fn plan_bundle(
         // Copy the whole bundle; only the patch may differ from the template.
         let mirror = old.is_none() && entry.seed == Seed::Copy && !exists(target);
         let mut doc = Doc::open(&patch_file, Format::Yaml, exists(&patch), mirror)?;
-        sync(&mut doc, spec, &patch_file, Format::Yaml)?;
+        for spec in &entry.sync {
+            if matches!(spec, Sync::Patch { .. }) {
+                sync(&mut doc, spec, &patch_file, Format::Yaml)?;
+            }
+        }
         let overlays = match finish(Some(doc), exists(&patch))? {
             Outcome::Bytes(bytes) => vec![(file.to_path_buf(), bytes)],
             Outcome::Keep | Outcome::Template => Vec::new(),

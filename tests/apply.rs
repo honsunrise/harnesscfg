@@ -760,3 +760,49 @@ fn one_file_can_sync_a_list_and_a_record() {
     assert!(text.contains("mine: custom/mine"), "{text}");
     assert!(text.contains("theme: dark"), "{text}");
 }
+
+#[test]
+fn bundle_patch_keys_follow_the_template_alongside_catalogs() {
+    let mut f = Fixture::new();
+    let bundle = f.root.join("gen0/dsh/bundle");
+    f.put(&bundle.join("package.json"), r#"{"name":"bundle"}"#);
+    f.put(
+        &bundle.join("cordis.patch.yml"),
+        "- id: llm-pi-ai\n  config:\n    providers:\n      hub:\n        models:\n          - id: old\n- id: mcp-kicad\n  config:\n    command: /nix/store/old/bin/kicad-mcp\n    args: []\n    serverName: kicad\n",
+    );
+    let target = f.home("dsh/bundle");
+    let mut entry = json!({"name": "dsh/bundle", "harness": "dsh", "source": bundle, "target": target, "seed": "copy"});
+    entry.as_object_mut().unwrap().insert(
+        "sync".into(),
+        json!([
+            {"kind": "patch", "id": "llm-pi-ai", "file": "cordis.patch.yml", "catalogs": ["models"]},
+            {"kind": "patch", "id": "mcp-kicad", "file": "cordis.patch.yml", "keys": ["command", "args"]},
+        ]),
+    );
+    f.entries.push(entry);
+    f.apply();
+    f.put(
+        &target.join("cordis.patch.yml"),
+        "- id: llm-pi-ai\n  config:\n    providers:\n      hub:\n        models:\n          - id: old\n          - id: custom\n- id: mcp-kicad\n  config:\n    command: /nix/store/old/bin/kicad-mcp\n    args: []\n    serverName: kicad\n    toolCallTimeoutMs: 1\n- id: custom-plugin\n  config:\n    value: mine\n",
+    );
+    f.next_generation();
+    let next = f.root.join("gen1/dsh/bundle");
+    f.put(&next.join("package.json"), r#"{"name":"new-package"}"#);
+    f.put(
+        &next.join("cordis.patch.yml"),
+        "- id: llm-pi-ai\n  config:\n    providers:\n      hub:\n        models:\n          - id: new\n- id: mcp-kicad\n  config:\n    command: /etc/profiles/per-user/me/bin/kicad-mcp\n    args: []\n",
+    );
+    f.entries[0]["source"] = json!(next);
+    f.apply();
+    let text = read(&target.join("cordis.patch.yml"));
+    assert!(
+        text.contains("/etc/profiles/per-user/me/bin/kicad-mcp"),
+        "{text}"
+    );
+    assert!(text.contains("toolCallTimeoutMs: 1"), "{text}");
+    assert!(text.contains("custom-plugin"), "{text}");
+    assert!(
+        text.contains("- id: custom") && !text.contains("- id: old\n"),
+        "{text}"
+    );
+}
