@@ -86,12 +86,21 @@ pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) ->
             id,
             field,
             catalogs,
-            keys,
             ..
         } => {
+            let items = user.as_array_mut().ok_or("patch list must be a list")?;
             let new = patch_config(current, id)?.unwrap_or_default();
             let old = patch_config(previous, id)?.unwrap_or_default();
-            let providers = |config: &Object| -> SyncResult<Object> {
+            let index = match patch_index(items, id)? {
+                Some(index) => index,
+                None => {
+                    items.push(serde_json::json!({ "id": id, "config": { field.as_str(): {} } }));
+                    items.len() - 1
+                }
+            };
+            let config = entry_object(object_mut(&mut items[index])?, "config")?;
+            let providers = entry_object(config, field)?;
+            let pick = |config: &Object| -> SyncResult<Object> {
                 Ok(config
                     .get(field.as_str())
                     .map(object)
@@ -99,30 +108,7 @@ pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) ->
                     .cloned()
                     .unwrap_or_default())
             };
-            let (new_providers, old_providers) = (providers(&new)?, providers(&old)?);
-            let owned = if keys.is_empty() {
-                (Object::new(), Object::new())
-            } else {
-                (
-                    pick(&Value::Object(new.clone()), keys)?,
-                    pick(&Value::Object(old.clone()), keys)?,
-                )
-            };
-            let items = user.as_array_mut().ok_or("patch list must be a list")?;
-            let index = match patch_index(items, id)? {
-                Some(index) => index,
-                None => {
-                    items.push(serde_json::json!({ "id": id, "config": {} }));
-                    items.len() - 1
-                }
-            };
-            let config = entry_object(object_mut(&mut items[index])?, "config")?;
-            if new.contains_key(field.as_str()) || old.contains_key(field.as_str()) {
-                let entry = entry_object(config, field)?;
-                sync_providers(entry, &new_providers, &old_providers, catalogs)?;
-            }
-            sync_owned(config, &owned.0, &owned.1);
-            Ok(())
+            sync_providers(providers, &pick(&new)?, &pick(&old)?, catalogs)
         }
     }
 }
@@ -515,38 +501,12 @@ mod tests {
     }
 
     #[test]
-    fn patch_keys_follow_the_template_and_keep_other_config() {
-        let spec = Sync::Patch {
-            id: "mcp-kicad".into(),
-            file: "cordis.patch.yml".into(),
-            field: "providers".into(),
-            catalogs: vec!["models".into()],
-            keys: vec!["command".into(), "args".into()],
-        };
-        let previous = json!([{"id": "mcp-kicad", "config": {"command": "/nix/store/old/bin/kicad-mcp", "user": 1}}]);
-        let mut user = json!([
-            {"id": "mcp-kicad", "config": {"command": "/nix/store/old/bin/kicad-mcp", "user": 1, "extra": true}},
-            {"id": "other", "config": {"v": 1}},
-        ]);
-        let current = json!([{"id": "mcp-kicad", "config": {"command": "/nix/store/new/bin/kicad-mcp", "args": []}}]);
-        sync(&spec, &mut user, &current, &previous).unwrap();
-        assert_eq!(
-            user,
-            json!([
-                {"id": "mcp-kicad", "config": {"command": "/nix/store/new/bin/kicad-mcp", "user": 1, "extra": true, "args": []}},
-                {"id": "other", "config": {"v": 1}},
-            ])
-        );
-    }
-
-    #[test]
     fn patch_lists_sync_only_their_providers() {
         let spec = Sync::Patch {
             id: "llm-pi-ai".into(),
             file: "cordis.patch.yml".into(),
             field: "providers".into(),
             catalogs: vec!["models".into()],
-            keys: Vec::new(),
         };
         let mut user = json!([{"id": "llm-pi-ai", "config": {"providers": {"hub": {"apiKeyEnv": "K", "models": [{"id": "old"}, {"id": "custom"}]}}}}, {"id": "other", "config": {"v": 1}}]);
         let previous = json!([{"id": "llm-pi-ai", "config": {"providers": {"hub": {"models": [{"id": "old"}]}}}}]);

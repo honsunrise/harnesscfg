@@ -104,8 +104,7 @@ pub enum Sync {
         catalogs: Vec<String>,
     },
     /// A YAML patch list inside a directory bundle; catalogs live under
-    /// `[id=<id>].config.<field>.<provider>.<catalog>`, and `keys` are other
-    /// `config` keys Nix owns verbatim.
+    /// `[id=<id>].config.<field>.<provider>.<catalog>`.
     Patch {
         id: String,
         file: PathBuf,
@@ -113,8 +112,6 @@ pub enum Sync {
         field: String,
         #[serde(default = "catalogs")]
         catalogs: Vec<String>,
-        #[serde(default)]
-        keys: Vec<String>,
     },
 }
 

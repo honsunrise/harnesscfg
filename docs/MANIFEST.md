@@ -117,10 +117,8 @@ Only those top-level keys and those `env` entries follow the template.
 | `file` | — (path inside the bundle) |
 | `field` | `providers` |
 | `catalogs` | `["models", "modelOverrides"]` |
-| `keys` | `[]` |
 
 The entry is a directory bundle whose `file` is a YAML list of
 `{id, config}` patches. The patch with `id` gets `providers`-style catalog
-merging on `config.<field>` when either template declares that field, and its
-`config` keys named by `keys` follow the template like `preset` keys. If the bundle does not exist (or is a store link)
+merging on `config.<field>`. If the bundle does not exist (or is a store link)
 the whole bundle is copied; afterwards only `file` is touched.
