@@ -40,7 +40,10 @@ pub fn plan(entries: &[Entry], previous: &[Previous], store: &Path) -> Result<Ve
 }
 
 fn plan_entry(entry: &Entry, old: Option<&Previous>, store: &Path) -> Result<Option<Write>> {
-    if let Some(Sync::Patch { file, .. }) = &entry.sync {
+    if let Some(file) = entry.sync.iter().find_map(|spec| match spec {
+        Sync::Patch { file, .. } => Some(file),
+        _ => None,
+    }) {
         return plan_bundle(entry, old, file, store);
     }
     let target = resolve_alternates(entry)?;
@@ -74,7 +77,7 @@ fn plan_file(
 ) -> Result<Option<Write>> {
     let expected = snapshot(file.target)?;
     let link = owned(file.target, store);
-    if old.is_some() && !link && entry.sync.is_none() {
+    if old.is_some() && !link && entry.sync.is_empty() {
         return Ok(None); // Initialized by an earlier generation; the client owns it now.
     }
     let mut doc: Option<Doc> = None;
@@ -92,7 +95,7 @@ fn plan_file(
         }
         doc = Some(d);
     }
-    if let Some(spec) = &entry.sync {
+    for spec in &entry.sync {
         let format = file
             .format
             .expect("manifest validation requires a format to sync");
@@ -141,7 +144,11 @@ fn plan_bundle(
             path: target.clone(),
         });
     }
-    let spec = entry.sync.as_ref().expect("bundles always sync");
+    let spec = entry
+        .sync
+        .iter()
+        .find(|spec| matches!(spec, Sync::Patch { .. }))
+        .expect("bundles always sync a patch");
     let template = entry.source.join(file);
     let previous = old.map(|o| o.source.join(file));
     let patch = target.join(file);

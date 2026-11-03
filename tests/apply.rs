@@ -728,3 +728,35 @@ fn originals_are_backed_up_once_per_generation() {
         0o600
     );
 }
+
+#[test]
+fn one_file_can_sync_a_list_and_a_record() {
+    let mut f = Fixture::new();
+    let target = f.entry(
+        "omp/config.yml",
+        "omp",
+        Some("yaml"),
+        "enabledModels: [hub/old]\nmodelRoles: {default: hub/old, plan: hub/old}\n",
+        json!({"sync": [
+            {"kind": "enabled"},
+            {"kind": "preset", "keys": ["modelRoles"], "envKeys": [], "envPrefixes": []},
+        ]}),
+    );
+    f.put(
+        &target,
+        "enabledModels: [hub/old, custom/mine]\nmodelRoles: {default: hub/old, plan: hub/old, mine: custom/mine}\ntheme: dark\n",
+    );
+    f.apply();
+    f.next_generation();
+    f.retemplate(
+        "omp/config.yml",
+        "enabledModels: [hub/new]\nmodelRoles: {default: hub/new, plan: hub/new}\n",
+    );
+    f.apply();
+    let text = read(&target);
+    assert!(text.contains("hub/new"), "{text}");
+    assert!(!text.contains("hub/old"), "{text}");
+    assert!(text.contains("custom/mine"), "{text}");
+    assert!(text.contains("mine: custom/mine"), "{text}");
+    assert!(text.contains("theme: dark"), "{text}");
+}

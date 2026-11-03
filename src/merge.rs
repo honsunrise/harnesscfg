@@ -45,14 +45,7 @@ pub fn fill_missing(user: &mut Object, defaults: &Object) -> bool {
 /// generation's template `previous` (empty on first sight).
 pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) -> SyncResult<()> {
     match spec {
-        Sync::Enabled { field, keys } => {
-            enabled(user, current, previous, field)?;
-            if !keys.is_empty() {
-                let (new, old) = (pick(current, keys)?, pick(previous, keys)?);
-                sync_owned(object_mut(user)?, &new, &old);
-            }
-            Ok(())
-        }
+        Sync::Enabled { field } => enabled(user, current, previous, field),
         Sync::Preset {
             keys,
             env_keys,
@@ -93,21 +86,12 @@ pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) ->
             id,
             field,
             catalogs,
+            keys,
             ..
         } => {
-            let items = user.as_array_mut().ok_or("patch list must be a list")?;
             let new = patch_config(current, id)?.unwrap_or_default();
             let old = patch_config(previous, id)?.unwrap_or_default();
-            let index = match patch_index(items, id)? {
-                Some(index) => index,
-                None => {
-                    items.push(serde_json::json!({ "id": id, "config": { field.as_str(): {} } }));
-                    items.len() - 1
-                }
-            };
-            let config = entry_object(object_mut(&mut items[index])?, "config")?;
-            let providers = entry_object(config, field)?;
-            let pick = |config: &Object| -> SyncResult<Object> {
+            let providers = |config: &Object| -> SyncResult<Object> {
                 Ok(config
                     .get(field.as_str())
                     .map(object)
@@ -115,7 +99,30 @@ pub fn sync(spec: &Sync, user: &mut Value, current: &Value, previous: &Value) ->
                     .cloned()
                     .unwrap_or_default())
             };
-            sync_providers(providers, &pick(&new)?, &pick(&old)?, catalogs)
+            let (new_providers, old_providers) = (providers(&new)?, providers(&old)?);
+            let owned = if keys.is_empty() {
+                (Object::new(), Object::new())
+            } else {
+                (
+                    pick(&Value::Object(new.clone()), keys)?,
+                    pick(&Value::Object(old.clone()), keys)?,
+                )
+            };
+            let items = user.as_array_mut().ok_or("patch list must be a list")?;
+            let index = match patch_index(items, id)? {
+                Some(index) => index,
+                None => {
+                    items.push(serde_json::json!({ "id": id, "config": {} }));
+                    items.len() - 1
+                }
+            };
+            let config = entry_object(object_mut(&mut items[index])?, "config")?;
+            if new.contains_key(field.as_str()) || old.contains_key(field.as_str()) {
+                let entry = entry_object(config, field)?;
+                sync_providers(entry, &new_providers, &old_providers, catalogs)?;
+            }
+            sync_owned(config, &owned.0, &owned.1);
+            Ok(())
         }
     }
 }
@@ -479,7 +486,6 @@ mod tests {
     fn enabled_lists_keep_custom_entries_first() {
         let spec = Sync::Enabled {
             field: "enabledModels".into(),
-            keys: Vec::new(),
         };
         let mut user = json!({"enabledModels": ["hub/old", "hub/keep", "custom/mine"], "modelRoles": {"default": "custom/mine"}});
         sync(
@@ -492,36 +498,6 @@ mod tests {
         assert_eq!(
             user,
             json!({"enabledModels": ["custom/mine", "hub/keep", "hub/new"], "modelRoles": {"default": "custom/mine"}})
-        );
-    }
-
-    #[test]
-    fn enabled_lists_can_own_a_record_without_dropping_user_roles() {
-        let spec = Sync::Enabled {
-            field: "enabledModels".into(),
-            keys: vec!["modelRoles".into()],
-        };
-        let previous = json!({
-            "enabledModels": ["hub/stale"],
-            "modelRoles": {"default": "hub/stale", "retired": "hub/stale"},
-        });
-        let mut user = json!({
-            "enabledModels": ["custom/mine", "hub/stale"],
-            "modelRoles": {"default": "hub/stale", "retired": "hub/stale", "mine": "custom/mine"},
-            "theme": "dark",
-        });
-        let current = json!({
-            "enabledModels": ["hub/new"],
-            "modelRoles": {"default": "hub/new", "plan": "hub/new"},
-        });
-        sync(&spec, &mut user, &current, &previous).unwrap();
-        assert_eq!(
-            user,
-            json!({
-                "enabledModels": ["custom/mine", "hub/new"],
-                "modelRoles": {"default": "hub/new", "plan": "hub/new", "mine": "custom/mine"},
-                "theme": "dark",
-            })
         );
     }
 
@@ -539,12 +515,38 @@ mod tests {
     }
 
     #[test]
+    fn patch_keys_follow_the_template_and_keep_other_config() {
+        let spec = Sync::Patch {
+            id: "mcp-kicad".into(),
+            file: "cordis.patch.yml".into(),
+            field: "providers".into(),
+            catalogs: vec!["models".into()],
+            keys: vec!["command".into(), "args".into()],
+        };
+        let previous = json!([{"id": "mcp-kicad", "config": {"command": "/nix/store/old/bin/kicad-mcp", "user": 1}}]);
+        let mut user = json!([
+            {"id": "mcp-kicad", "config": {"command": "/nix/store/old/bin/kicad-mcp", "user": 1, "extra": true}},
+            {"id": "other", "config": {"v": 1}},
+        ]);
+        let current = json!([{"id": "mcp-kicad", "config": {"command": "/nix/store/new/bin/kicad-mcp", "args": []}}]);
+        sync(&spec, &mut user, &current, &previous).unwrap();
+        assert_eq!(
+            user,
+            json!([
+                {"id": "mcp-kicad", "config": {"command": "/nix/store/new/bin/kicad-mcp", "user": 1, "extra": true, "args": []}},
+                {"id": "other", "config": {"v": 1}},
+            ])
+        );
+    }
+
+    #[test]
     fn patch_lists_sync_only_their_providers() {
         let spec = Sync::Patch {
             id: "llm-pi-ai".into(),
             file: "cordis.patch.yml".into(),
             field: "providers".into(),
             catalogs: vec!["models".into()],
+            keys: Vec::new(),
         };
         let mut user = json!([{"id": "llm-pi-ai", "config": {"providers": {"hub": {"apiKeyEnv": "K", "models": [{"id": "old"}, {"id": "custom"}]}}}}, {"id": "other", "config": {"v": 1}}]);
         let previous = json!([{"id": "llm-pi-ai", "config": {"providers": {"hub": {"models": [{"id": "old"}]}}}}]);

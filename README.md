@@ -140,7 +140,10 @@ $ harnesscfg status <manifest> # per-file state: missing / store-link / writable
 | `enabled` | the list `field` (default `enabledModels`); ids you added stay first | `omp/config.yml`, `pi/settings.json` |
 | `providers` | `<field>.<provider>.<catalog>` records by id (default `providers.*.{models,modelOverrides}`); a provider Nix adds is copied whole | `omp/models.yml`, `pi/models.json`, `opencode/opencode.json` |
 | `preset` | `keys` and model-related `env` entries of a preset file | Claude / Codex model presets |
-| `patch` | the provider catalogs inside one entry (`id`) of a YAML patch list `file` in a directory bundle | DeepSeek Harness profiles |
+| `patch` | the provider catalogs inside one entry (`id`) of a YAML patch list `file` in a directory bundle, plus `config` keys named by `keys` | DeepSeek Harness profiles |
+
+A `sync` may be a list of specs, applied in order, when one file has unrelated
+Nix-owned fields (for example an enabled list and a role record).
 
 Full schema and defaults: [`docs/MANIFEST.md`](docs/MANIFEST.md).
 

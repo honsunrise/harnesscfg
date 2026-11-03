@@ -47,9 +47,10 @@ pub struct Entry {
     /// to an existing user file. `copy`: only create the file when missing.
     #[serde(default)]
     pub seed: Seed,
-    /// Nix-owned fields kept in sync on every activation.
-    #[serde(default)]
-    pub sync: Option<Sync>,
+    /// Nix-owned fields kept in sync on every activation. One spec object or a
+    /// list of them, applied in order; a file can own several unrelated fields.
+    #[serde(default, deserialize_with = "sync_specs")]
+    pub sync: Vec<Sync>,
     /// Sibling names the client accepts for the same file, e.g.
     /// `opencode.jsonc` for `opencode.json`. An existing one is used instead.
     #[serde(default)]
@@ -84,9 +85,6 @@ pub enum Sync {
     Enabled {
         #[serde(default = "enabled_field")]
         field: String,
-        /// Extra top-level keys Nix owns, merged like `preset` keys.
-        #[serde(default)]
-        keys: Vec<String>,
     },
     /// Top-level model fields and model-related `env` entries of a preset.
     #[serde(rename_all = "camelCase")]
@@ -106,7 +104,8 @@ pub enum Sync {
         catalogs: Vec<String>,
     },
     /// A YAML patch list inside a directory bundle; catalogs live under
-    /// `[id=<id>].config.<field>.<provider>.<catalog>`.
+    /// `[id=<id>].config.<field>.<provider>.<catalog>`, and `keys` are other
+    /// `config` keys Nix owns verbatim.
     Patch {
         id: String,
         file: PathBuf,
@@ -114,6 +113,8 @@ pub enum Sync {
         field: String,
         #[serde(default = "catalogs")]
         catalogs: Vec<String>,
+        #[serde(default)]
+        keys: Vec<String>,
     },
 }
 
@@ -125,6 +126,24 @@ impl Sync {
             env_prefixes: preset_env_prefixes(),
         }
     }
+}
+
+/// Accept a single spec (older manifests and hand-written ones) or a list.
+fn sync_specs<'de, D>(deserializer: D) -> std::result::Result<Vec<Sync>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum OneOrMany {
+        One(Sync),
+        Many(Vec<Sync>),
+    }
+    Ok(match Option::<OneOrMany>::deserialize(deserializer)? {
+        None => Vec::new(),
+        Some(OneOrMany::One(spec)) => vec![spec],
+        Some(OneOrMany::Many(specs)) => specs,
+    })
 }
 
 fn enabled_field() -> String {
@@ -189,10 +208,12 @@ impl Manifest {
                 )));
             }
             let needs_format = entry.seed == Seed::Merge
-                || matches!(
-                    entry.sync,
-                    Some(Sync::Enabled { .. } | Sync::Preset { .. } | Sync::Providers { .. })
-                );
+                || entry.sync.iter().any(|spec| {
+                    matches!(
+                        spec,
+                        Sync::Enabled { .. } | Sync::Preset { .. } | Sync::Providers { .. }
+                    )
+                });
             if needs_format && entry.format.is_none() {
                 return Err(invalid(format!(
                     "{}: merge and model sync need a format",
@@ -229,4 +250,50 @@ pub fn previous(path: Option<&Path>) -> Result<Vec<Previous>> {
         reason: e.to_string(),
     })?;
     Ok(loose.entries)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn entry(sync: serde_json::Value) -> Entry {
+        serde_json::from_value(json!({
+            "name": "omp/config.yml",
+            "harness": "omp",
+            "source": "/nix/store/template",
+            "target": "/home/u/.omp/agent/config.yml",
+            "format": "yaml",
+            "sync": sync,
+        }))
+        .unwrap()
+    }
+
+    #[test]
+    fn sync_accepts_a_spec_or_a_list_of_specs() {
+        assert_eq!(
+            entry(json!({"kind": "enabled"})).sync,
+            vec![Sync::Enabled {
+                field: "enabledModels".into()
+            }]
+        );
+        assert_eq!(
+            entry(json!([
+                {"kind": "enabled"},
+                {"kind": "preset", "keys": ["modelRoles"], "envKeys": [], "envPrefixes": []},
+            ]))
+            .sync,
+            vec![
+                Sync::Enabled {
+                    field: "enabledModels".into()
+                },
+                Sync::Preset {
+                    keys: vec!["modelRoles".into()],
+                    env_keys: Vec::new(),
+                    env_prefixes: Vec::new(),
+                },
+            ]
+        );
+        assert!(entry(json!(null)).sync.is_empty());
+    }
 }

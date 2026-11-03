@@ -157,9 +157,9 @@ let
           '';
         };
         sync = mkOption {
-          type = types.nullOr syncType;
+          type = types.nullOr (types.either syncType (types.listOf syncType));
           default = null;
-          description = "Nix-owned fields to keep in sync on every activation.";
+          description = "Nix-owned fields to keep in sync on every activation; one spec or a list applied in order.";
         };
         alternates = mkOption {
           type = types.listOf types.str;
@@ -198,10 +198,10 @@ let
         target
         format
         seed
-        sync
         alternates
         lock
         ;
+      sync = if f.sync == null then null else lib.toList f.sync;
       source = "${f.source}";
     }) enabled;
   };

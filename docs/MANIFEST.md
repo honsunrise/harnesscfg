@@ -45,7 +45,7 @@ module.
 | `target` | — | Absolute path the harness reads. |
 | `format` | `null` | `json` (comments and trailing commas accepted), `toml`, `yaml`, or `null` for opaque files and bundles. |
 | `seed` | `merge` | `merge`: the first time the entry is managed, add missing template keys to an existing file. `copy`: only create the file when missing. `merge` needs a `format`. |
-| `sync` | `null` | Nix-owned fields, see below. |
+| `sync` | `null` | Nix-owned fields, see below: one spec object or a list of them, applied in order. |
 | `alternates` | `[]` | Sibling file names the harness accepts for the same file (`opencode.jsonc`). If exactly one candidate exists it is used; more than one is an error. |
 | `lock` | `none` | `omp`: hold oh-my-pi's FileLock while rewriting. |
 
@@ -65,20 +65,18 @@ module.
 ## Sync kinds
 
 `current` is this generation's template, `previous` the previous generation's
-(empty when the entry is new).
+(empty when the entry is new). A spec owns one aspect of a file; list several
+when a file has unrelated managed fields (e.g. OMP's `enabledModels` list and
+its `modelRoles` record).
 
 ### `enabled`
 
 | Field | Default |
 | --- | --- |
 | `field` | `enabledModels` |
-| `keys` | `[]` |
 
 Result: ids of the user list that neither template mentions, in user order,
-followed by `current`'s list. Other keys are untouched, except those `keys`
-names: they follow the template like `preset` keys, recursing into records, so
-a template role overwrites the user's value, a role only the previous template
-declared is removed, and entries the user added stay.
+followed by `current`'s list. Other keys are untouched.
 
 ### `providers`
 
@@ -119,8 +117,10 @@ Only those top-level keys and those `env` entries follow the template.
 | `file` | — (path inside the bundle) |
 | `field` | `providers` |
 | `catalogs` | `["models", "modelOverrides"]` |
+| `keys` | `[]` |
 
 The entry is a directory bundle whose `file` is a YAML list of
 `{id, config}` patches. The patch with `id` gets `providers`-style catalog
-merging on `config.<field>`. If the bundle does not exist (or is a store link)
+merging on `config.<field>` when either template declares that field, and its
+`config` keys named by `keys` follow the template like `preset` keys. If the bundle does not exist (or is a store link)
 the whole bundle is copied; afterwards only `file` is touched.
