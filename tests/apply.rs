@@ -3,6 +3,7 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Output};
 
 use harnesscfg::apply::{self, Options};
 use serde_json::{Value, json};
@@ -105,6 +106,18 @@ impl Fixture {
         self.apply_with(false).unwrap()
     }
 
+    fn cli(&self, subcommand: &str, previous: Option<&Path>) -> Output {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_harnesscfg"));
+        command
+            .env_remove("DRY_RUN")
+            .arg(subcommand)
+            .arg(self.manifest());
+        if let Some(previous) = previous {
+            command.arg("--previous").arg(previous);
+        }
+        command.output().unwrap()
+    }
+
     /// Finish this generation: its manifest becomes the previous one.
     fn next_generation(&mut self) {
         self.previous = Some(self.manifest());
@@ -122,6 +135,84 @@ fn read(path: &Path) -> String {
 
 fn json_of(path: &Path) -> Value {
     serde_json::from_str(&read(path)).unwrap()
+}
+
+#[test]
+fn cli_first_use_accepts_omitted_and_empty_previous_manifest() {
+    for previous in [None, Some(Path::new(""))] {
+        let mut f = Fixture::new();
+        let target = f.entry(
+            "pi/settings.json",
+            "pi",
+            Some("json"),
+            r#"{"enabledModels":["managed"],"theme":"dark"}"#,
+            json!({"sync":{"kind":"enabled"}}),
+        );
+        for subcommand in ["plan", "status"] {
+            let output = f.cli(subcommand, previous);
+            assert!(output.status.success(), "{output:?}");
+            assert!(!target.exists());
+            assert!(!f.backups().exists());
+        }
+        let output = f.cli("apply", previous);
+        assert!(output.status.success(), "{output:?}");
+        assert_eq!(
+            json_of(&target),
+            json!({"enabledModels":["managed"],"theme":"dark"})
+        );
+    }
+}
+
+#[test]
+fn cli_upgrade_uses_previous_manifest_with_spaces() {
+    let mut f = Fixture::new();
+    let target = f.entry(
+        "pi/settings.json",
+        "pi",
+        Some("json"),
+        r#"{"enabledModels":["old"],"theme":"dark"}"#,
+        json!({"sync":{"kind":"enabled"}}),
+    );
+    assert!(f.cli("apply", None).status.success());
+    let previous = f.root.join("previous generation.json");
+    fs::copy(f.manifest(), &previous).unwrap();
+    f.next_generation();
+    f.retemplate(
+        "pi/settings.json",
+        r#"{"enabledModels":["new"],"theme":"light"}"#,
+    );
+    f.put(
+        &target,
+        r#"{"enabledModels":["old","custom"],"theme":"user"}"#,
+    );
+    let output = f.cli("apply", Some(&previous));
+    assert!(output.status.success(), "{output:?}");
+    assert_eq!(
+        json_of(&target),
+        json!({"enabledModels":["custom","new"],"theme":"user"})
+    );
+}
+
+#[test]
+fn cli_rejects_previous_without_a_value_before_writing() {
+    let mut f = Fixture::new();
+    let target = f.entry(
+        "pi/settings.json",
+        "pi",
+        Some("json"),
+        r#"{"theme":"dark"}"#,
+        json!({}),
+    );
+    let output = Command::new(env!("CARGO_BIN_EXE_harnesscfg"))
+        .env_remove("DRY_RUN")
+        .arg("apply")
+        .arg(f.manifest())
+        .arg("--previous")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(!target.exists());
+    assert!(!f.backups().exists());
 }
 
 #[test]

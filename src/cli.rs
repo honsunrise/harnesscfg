@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum, builder::TypedValueParser};
 
 use crate::apply::{self, Options};
 use crate::error::Result;
@@ -42,7 +42,7 @@ struct Run {
     /// Manifest of the generation being activated.
     manifest: PathBuf,
     /// Manifest of the previous generation; empty or missing on first use.
-    #[arg(long)]
+    #[arg(long, value_parser = clap::builder::OsStringValueParser::new().map(PathBuf::from))]
     previous: Option<PathBuf>,
 }
 

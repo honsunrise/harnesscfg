@@ -287,11 +287,12 @@ in
     # After the new generation is linked into place is too late: Home Manager
     # would already have removed store links the previous generation owned.
     home.activation.harnesscfg = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
-      previous=""
+      previousArgs=()
       if [[ -n "''${oldGenPath:-}" ]]; then
-        previous="$oldGenPath/home-files/"${lib.escapeShellArg manifestRelative}
+        previousArgs=(--previous "$oldGenPath/home-files/"${lib.escapeShellArg manifestRelative})
       fi
-      ${lib.getExe cfg.package} apply ${manifest} --previous "$previous"
+      ${lib.getExe cfg.package} apply ${manifest} "''${previousArgs[@]}"
+      unset previousArgs
     '';
   };
 }

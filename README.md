@@ -49,6 +49,12 @@ The Home Manager module accepts either one `sync` spec or a list. Every
 non-`patch` spec requires the file's `format`; an opaque copied bundle may
 omit it only when all of its sync specs are `patch` specs (or it has none).
 
+On first activation (including an ephemeral-home reboot with no previous
+generation), the module omits `--previous`. The CLI also accepts an explicit
+empty value as no previous manifest for `apply`, `plan`, and `status`.
+`--previous` without an argument remains an error; a non-empty path still
+selects the previous manifest for three-way synchronization.
+
 ## Guarantees
 
 - **All or nothing.** Every file is planned before any is written. One
