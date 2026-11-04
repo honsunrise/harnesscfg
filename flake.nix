@@ -26,6 +26,9 @@
 
       checks = forAll (pkgs: {
         package = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        home-module = pkgs.callPackage ./nix/hm-module-tests.nix {
+          module = self.homeModules.default;
+        };
         format =
           pkgs.runCommand "harnesscfg-format"
             {

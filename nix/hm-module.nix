@@ -273,9 +273,9 @@ in
           }
           {
             assertion = lib.all (spec: spec.kind == "patch") specs || f.format != null;
-            message = "harnesscfg: ${name}: sync kinds ${lib.concatMapStringsSep ", " (
-              spec: spec.kind
-            ) specs} need a format";
+            message = "harnesscfg: ${name}: sync kinds ${
+              lib.concatMapStringsSep ", " (spec: spec.kind) specs
+            } need a format";
           }
         ]
       ) enabled

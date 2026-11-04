@@ -45,6 +45,10 @@ Everything else in the file is left byte-for-byte as it was. JSON (with
 comments), TOML and YAML are edited through lossless syntax trees: comments,
 key order, quoting and layout outside the changed nodes survive.
 
+The Home Manager module accepts either one `sync` spec or a list. Every
+non-`patch` spec requires the file's `format`; an opaque copied bundle may
+omit it only when all of its sync specs are `patch` specs (or it has none).
+
 ## Guarantees
 
 - **All or nothing.** Every file is planned before any is written. One
