@@ -250,27 +250,35 @@ in
 
   config = lib.mkIf cfg.enable {
     assertions = lib.flatten (
-      lib.mapAttrsToList (name: f: [
-        {
-          assertion = registry ? ${f.harness} || f.target != null;
-          message = "harnesscfg: ${name}: unknown harness ${f.harness}";
-        }
-        {
-          assertion =
-            !(registry ? ${f.harness})
-            || registry.${f.harness}.platforms or [ ] == [ ]
-            || lib.elem platform registry.${f.harness}.platforms;
-          message = "harnesscfg: ${name}: ${f.harness} is not documented for ${platform}";
-        }
-        {
-          assertion = f.seed == "copy" || f.format != null;
-          message = "harnesscfg: ${name}: seed = \"merge\" needs a format";
-        }
-        {
-          assertion = f.sync == null || f.sync.kind == "patch" || f.format != null;
-          message = "harnesscfg: ${name}: sync.kind = \"${f.sync.kind or ""}\" needs a format";
-        }
-      ]) enabled
+      lib.mapAttrsToList (
+        name: f:
+        let
+          specs = if f.sync == null then [ ] else lib.toList f.sync;
+        in
+        [
+          {
+            assertion = registry ? ${f.harness} || f.target != null;
+            message = "harnesscfg: ${name}: unknown harness ${f.harness}";
+          }
+          {
+            assertion =
+              !(registry ? ${f.harness})
+              || registry.${f.harness}.platforms or [ ] == [ ]
+              || lib.elem platform registry.${f.harness}.platforms;
+            message = "harnesscfg: ${name}: ${f.harness} is not documented for ${platform}";
+          }
+          {
+            assertion = f.seed == "copy" || f.format != null;
+            message = "harnesscfg: ${name}: seed = \"merge\" needs a format";
+          }
+          {
+            assertion = lib.all (spec: spec.kind == "patch") specs || f.format != null;
+            message = "harnesscfg: ${name}: sync kinds ${lib.concatMapStringsSep ", " (
+              spec: spec.kind
+            ) specs} need a format";
+          }
+        ]
+      ) enabled
     );
 
     home.packages = [ cfg.package ];
